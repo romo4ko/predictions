@@ -16,28 +16,55 @@ class PredictionRepository extends ServiceEntityRepository
         parent::__construct($registry, Prediction::class);
     }
 
-    //    /**
-    //     * @return Prediction[] Returns an array of Prediction objects
-    //     */
-    //    public function findByExampleField($value): array
-    //    {
-    //        return $this->createQueryBuilder('p')
-    //            ->andWhere('p.exampleField = :val')
-    //            ->setParameter('val', $value)
-    //            ->orderBy('p.id', 'ASC')
-    //            ->setMaxResults(10)
-    //            ->getQuery()
-    //            ->getResult()
-    //        ;
-    //    }
+    /**
+     * @return Prediction[] Returns an array of Prediction objects
+     */
+    public function findByExampleField($value): array
+    {
+        return $this->createQueryBuilder('p')
+            ->andWhere('p.exampleField = :val')
+            ->setParameter('val', $value)
+            ->orderBy('p.id', 'ASC')
+            ->setMaxResults(10)
+            ->getQuery()
+            ->getResult()
+        ;
+    }
 
-    //    public function findOneBySomeField($value): ?Prediction
-    //    {
-    //        return $this->createQueryBuilder('p')
-    //            ->andWhere('p.exampleField = :val')
-    //            ->setParameter('val', $value)
-    //            ->getQuery()
-    //            ->getOneOrNullResult()
-    //        ;
-    //    }
+    public function findOneBySomeField($value): ?Prediction
+    {
+        return $this->createQueryBuilder('p')
+            ->andWhere('p.exampleField = :val')
+            ->setParameter('val', $value)
+            ->getQuery()
+            ->getOneOrNullResult()
+        ;
+    }
+
+    public function findRandomOne(): ?Prediction
+    {
+        $qb = $this->createQueryBuilder('prediction')
+            ->select('COUNT(prediction)')
+            /*
+            ->where('entity.someProperty = :param1')
+            ->setParameter(':param1', $param1)
+            */
+        ;
+
+        $totalRecords = $qb->getQuery()->getSingleScalarResult();
+
+        if ($totalRecords < 1) {
+            return null;
+        }
+
+        $rowToFetch = rand(0, $totalRecords - 1);
+
+        return $qb
+            ->select('prediction')
+            ->setMaxResults(1)
+            ->setFirstResult($rowToFetch)
+            ->getQuery()
+            ->getOneOrNullResult()
+            ;
+    }
 }
